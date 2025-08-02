@@ -9,6 +9,7 @@ import com.henr1que.literalura.service.ConsumoAPI;
 import com.henr1que.literalura.service.ConverteDados;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Principal {
@@ -94,18 +95,25 @@ public class Principal {
                     return repositorioAutor.save(novoAutor);
                 });
 
-        // Cria um novo livro com os dados obtidos
-        Livro livro = new Livro(dados.livros().getFirst());
-        livro.setAutor(autor);
-        repositorioLivro.save(livro);
+        Optional<Livro> livroVerificado = repositorioLivro.findByTitulo(dados.livros().getFirst().titulo());
 
-        System.out.println("\n----------------------------");
-        System.out.println("Livro adicionado com sucesso!");
-        System.out.println("Título: " + livro.getTitulo());
-        System.out.println("Autor: " + livro.getAutor().getNome());
-        System.out.println("Idioma: " + livro.getIdioma());
-        System.out.println("Número de downloads: " + livro.getNumeroDownloads());
-        System.out.println("----------------------------\n");
+        if (livroVerificado.isPresent()) {
+            System.out.println("O livro " + livroVerificado.get().getTitulo() + " já está cadastrado!");
+            return;
+        } else {
+            // Cria um novo livro com os dados obtidos
+            Livro livro = new Livro(dados.livros().getFirst());
+            livro.setAutor(autor);
+            repositorioLivro.save(livro);
+
+            System.out.println("\n----------------------------");
+            System.out.println("Livro adicionado com sucesso!");
+            System.out.println("Título: " + livro.getTitulo());
+            System.out.println("Autor: " + livro.getAutor().getNome());
+            System.out.println("Idioma: " + livro.getIdioma());
+            System.out.println("Número de downloads: " + livro.getNumeroDownloads());
+            System.out.println("----------------------------\n");
+        }
     }
 
     private Dados getDadosLivro() {
